@@ -102,22 +102,6 @@ Run test cases using Jest:
 npm test
 ```
 
-## Contributing
-1. Fork the repository.
-2. Create a new branch:
-   ```bash
-   git checkout -b feature-branch-name
-   ```
-3. Commit your changes:
-   ```bash
-   git commit -m 'Add some feature'
-   ```
-4. Push to the branch:
-   ```bash
-   git push origin feature-branch-name
-   ```
-5. Create a pull request.
-
 ## License
 This project is licensed under the ISC License. See the `LICENSE` file for details.
 
