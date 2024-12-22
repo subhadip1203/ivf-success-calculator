@@ -101,9 +101,6 @@ Run test cases using Jest:
 ```bash
 npm test
 ```
-```bash
-npm test
-```
 
 ## Contributing
 1. Fork the repository.
