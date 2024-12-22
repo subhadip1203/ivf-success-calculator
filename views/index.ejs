@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .form-header {
+            background-color: #ccdbeb;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 30px; 
+            border:1px solid grey
+
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container mt-5" id="vue_app">
+
+        <div class="modal fade add-account-modal modal-wrapper " id="attentionModel" tabindex="-1"
+            aria-labelledby="attentionModelLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title text-center" id="thankyouModalLabel">Result</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <h3 class="text-center"> IVF Success Rate: {{this.result}} </h3>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <h2 class="text-center mb-2">IVF Success Form</h2>
+        <p class="text-center mb-4">Please fill out the form below to calculate your IVF success rate.</p>
+
+        <form @submit.prevent="submitForm">
+            <div class="row">
+                <!-- Background and History Section -->
+                <div class="col-md-6" style="padding: 0px 25px;">
+                    <h4 class="form-header">Background and History</h4>
+                    <div class="mb-3">
+                        <label for="age" class="form-label">How old are you?</label>
+                        <input type="number" class="form-control" id="age" v-model="age"
+                            placeholder="Enter age between 20 and 50 years" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="weight" class="form-label">How much do you weigh?</label>
+                        <input type="number" class="form-control" id="weight" v-model="weight"
+                            placeholder="Enter weight between 80–300 lbs" required>
+                    </div>
+                    <div class="mb-3 row">
+                        <div class="col">
+                            <label for="heightFeet" class="form-label">Feet</label>
+                            <input type="number" class="form-control" id="heightFeet" v-model="heightFeet"
+                                placeholder="Feet" required>
+                        </div>
+                        <div class="col">
+                            <label for="heightInches" class="form-label">Inches</label>
+                            <input type="number" class="form-control" id="heightInches" v-model="heightInches"
+                                placeholder="Inches" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="priorIVF" class="form-label">How many times have you used IVF in the past?</label>
+                        <select class="form-select" id="priorIVF" v-model="attemptedIVF" required>
+                            <option value="">-- Select Option --</option>
+                            <option :value="false">0</option>
+                            <option :value="true">1 or more</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="priorPregnancies" class="form-label">How many prior pregnancies have you
+                            had?</label>
+                        <select class="form-select" id="priorPregnancies" v-model="priorPregnancies" required>
+                            <option value="">-- Select Option --</option>
+                            <option value="0">Never</option>
+                            <option value="1">1</option>
+                            <option value="2">2 or more</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="liveBirths" class="form-label">How many live births have you had?</label>
+                        <select class="form-select" id="liveBirths" v-model="liveBirths" required>
+                            <option value="">-- Select Option --</option>
+                            <option value="0">Never</option>
+                            <option value="1">1</option>
+                            <option value="2">2 or more</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Diagnosis and Plan Section -->
+                <div class="col-md-6" style="padding: 0px 25px;">
+                    <h4 class="form-header">Diagnosis and Plan</h4>
+                    <div class="mb-3">
+                        <label class="form-label">What is the reason you are using IVF? (select all that apply)</label>
+                        <div v-for="(value, key) in infertilityReasons" :key="key" class="form-check">
+                            <input class="form-check-input" type="checkbox" :id="key" v-model="infertilityReasons[key]">
+                            <label class="form-check-label" :for="key">{{ key.replace(/_/g, ' ') }}</label>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="usingEggs" class="form-label">Do you plan to use your own eggs or donor
+                            eggs?</label>
+                        <select class="form-select" id="usingEggs" v-model="usingOwnEggs" required>
+                            <option value="">-- Select Option --</option>
+                            <option :value="true">Own eggs</option>
+                            <option :value="false">Donor eggs</option>
+                        </select>
+                    </div>
+                    <div class="mb-3" style="color:#dd5555" v-if="error">
+                        Server Error : {{error}}
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-center mt-4">
+                <button type="submit" class="btn btn-primary">Calculate Success</button>
+            </div>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/vue.js"></script>
+    <script src="/axios.min.js"></script>
+    <script>
+
+
+
+        const app = Vue.createApp({
+            data() {
+                return {
+                    usingOwnEggs: '',
+                    attemptedIVF: '',
+                    age: null,
+                    weight: null,
+                    heightFeet: null,
+                    heightInches: null,
+                    infertilityReasons: {
+                        tubal_factor: false,
+                        male_factor_infertility: false,
+                        endometriosis: false,
+                        ovulatory_disorder: false,
+                        diminished_ovarian_reserve: false,
+                        uterine_factor: false,
+                        other_reason: false,
+                        unexplained_infertility: false
+                    },
+                    priorPregnancies: '',
+                    liveBirths: '',
+
+
+                    // -----
+                    result: '',
+                    error: '',
+                };
+            },
+            computed: {
+
+            },
+            watch: {
+
+            },
+            methods: {
+                async submitForm() {
+                    try {
+
+                        this.result = ''
+                        this.error= ''
+
+                        const userData = {
+                            usingOwnEggs: this.usingOwnEggs,
+                            attemptedIVF: this.attemptedIVF,
+                            age: this.age,
+                            weight: this.weight,
+                            heightFeet: this.heightFeet,
+                            heightInches: this.heightInches,
+                            infertilityReasons: {
+                                tubal_factor: this.infertilityReasons.tubal_factor,
+                                male_factor_infertility: this.infertilityReasons.male_factor_infertility,
+                                endometriosis: this.infertilityReasons.endometriosis,
+                                ovulatory_disorder: this.infertilityReasons.ovulatory_disorder,
+                                diminished_ovarian_reserve: this.infertilityReasons.diminished_ovarian_reserve,
+                                uterine_factor: this.infertilityReasons.uterine_factor,
+                                other_reason: this.infertilityReasons.other_reason,
+                                unexplained_infertility: this.infertilityReasons.unexplained_infertility
+                            },
+                            priorPregnancies: this.priorPregnancies,
+                            liveBirths: this.liveBirths
+                        };
+
+                        // console.log(userData);
+
+                        const apiRes = await axios.post('/api/calculate', userData)
+                        if (apiRes.status === 200 && apiRes.data) {
+                            console.log("apiRes", apiRes.data);
+                            const score = apiRes.data;
+                            var successRate = Math.exp(score) / (1 + Math.exp(score));
+                            this.result = (successRate * 100).toFixed(2) + '%'
+                            console.log("result",  this.result);
+
+                            var myModal = new bootstrap.Modal(document.getElementById('attentionModel'), {
+                                keyboard: false
+                            });
+                            myModal.show();
+                        }else{
+                            this.error = "Error in calculation";
+                        }
+
+
+                    } catch (err) {
+                        console.log(err);
+                        this.error = "Error in calculation";
+                    }
+                },
+            },
+            mounted: async function () {
+            }
+
+        });
+
+        app.mount("#vue_app");
+    </script>
+    
+</body>
+
+</html>
