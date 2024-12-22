@@ -1,6 +1,6 @@
 # IVF Success Calculator
 
-This project is a web-based application for predicting the likelihood of success for in-vitro fertilization (IVF) based on user input and pre-defined formulas.
+This project is a web-based application that predicts the likelihood of success for in-vitro fertilization (IVF) based on user input and pre-defined formulas.
 
 ## Features
 - **Dynamic User Input**: Collects user data through a form, including factors like age, weight, height, and IVF history.
@@ -105,5 +105,3 @@ npm test
 ## License
 This project is licensed under the ISC License. See the `LICENSE` file for details.
 
-## Acknowledgements
-Special thanks to all contributors and open-source libraries used in this project.
